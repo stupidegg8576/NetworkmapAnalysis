@@ -1,0 +1,6 @@
+Microsoft:
+  con1:
+    with: [desktop]
+    without: [iphone,ipad]
+  con2:
+    with: [windows]

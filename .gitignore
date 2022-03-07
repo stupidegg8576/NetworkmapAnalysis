@@ -4,3 +4,6 @@ Data/test.csv
 test.py
 *.csv
 *.csv#
+test.yaml
+testyaml.py
+test.py

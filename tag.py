@@ -1,7 +1,7 @@
 import yaml
+import func
 
 TAGFILE_PATH = 'tag.yaml'
-MAX_TAG = 10
 
 tag_statics = {}
 
@@ -121,6 +121,27 @@ def mac_check(target_string:list, mac_addr:str):
     #didn't match any target mac addr    
     return False
 
+def mac_between(target_mac_range:list, mac_addr:str):
+    #check if mac_addr is in target mac range
+    #target_mac_range[0] <= mac addr <= target_mac_range[1]
+    if type(target_mac_range) is not list or type(mac_addr) is not str:
+        raise BaseException("mac_between: input wrong data type")
+    if len(target_mac_range) < 2:
+        # should input at least 2 mac
+        raise BaseException("Tag file error: mac_between() input target mac should a list with 2 mac")
+
+    if func.mac_format_check(mac_addr) is False:
+        #mac_addr is a bad mac
+        return False
+
+    for c in range(len(mac_addr)):
+        if  (target_mac_range[0][c] is not 'x' and target_mac_range[0][c] > mac_addr[c]) or \
+            (target_mac_range[1][c] is not 'x' and target_mac_range[1][c] < mac_addr[c]):
+            #target_mac_range[0] <= mac addr <= target_mac_range[1]
+            return False
+    #pass 
+    return True
+
 def has_tag(target_tag:list, tags:list):
     #check if any target tag is in the previous tag list
     for t in target_tag:
@@ -142,7 +163,8 @@ def print_tag_static():
         print(tag + ':' + str(tag_statics[tag]))
 
 def get_tags(mac_addr:str, vendor_class:str, host_name:str):
-    
+    #input a device info
+    #check if its info match any tag's condition in tag file
     passed_tags = []
     """
     Tag structure will be like:
@@ -172,23 +194,23 @@ def get_tags(mac_addr:str, vendor_class:str, host_name:str):
                     #with or without or ...
                     
                     if subconditions.startswith('without'):
-                        check_flag = without_check(tagyaml[tag][conditions][subconditions],vendor_class,host_name)
+                        check_flag = without_check(tagyaml[tag][conditions][subconditions], vendor_class, host_name)
                     
                     elif subconditions.startswith('with'):
-                        check_flag = with_check(tagyaml[tag][conditions][subconditions],vendor_class,host_name)
+                        check_flag = with_check(tagyaml[tag][conditions][subconditions], vendor_class, host_name)
                     
                     elif subconditions.startswith('exactlywith'):
-                        check_flag = exactly_with_check(tagyaml[tag][conditions][subconditions],vendor_class,host_name)
+                        check_flag = exactly_with_check(tagyaml[tag][conditions][subconditions], vendor_class, host_name)
                     
                     elif subconditions.startswith('mac'):
-                        check_flag = mac_check(tagyaml[tag][conditions][subconditions],mac_addr)
+                        check_flag = mac_between(tagyaml[tag][conditions][subconditions], mac_addr)
                                         
                     elif subconditions.startswith('hastag'):
                         #send all previous tag to check if this device has a tag or not
-                        check_flag = has_tag(tagyaml[tag][conditions][subconditions],passed_tags)
+                        check_flag = has_tag(tagyaml[tag][conditions][subconditions], passed_tags)
                         
                     elif subconditions.startswith('notag'):
-                        check_flag = no_tag(tagyaml[tag][conditions][subconditions],passed_tags)
+                        check_flag = no_tag(tagyaml[tag][conditions][subconditions], passed_tags)
                                             
                     else:
                         raise BaseException("Tag file error: can't find subcondition")

@@ -47,3 +47,4 @@ if __name__ == '__main__':
     device_data = read_device_data_file(INPUT_DATA_PATH)
     output_file = apply_tag(device_data, max_check=0)
     output_file.T.to_csv(OUTPUT_DATA_PATH)
+    tag.print_tag_static()

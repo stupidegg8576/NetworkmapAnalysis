@@ -1,2 +1,6 @@
 Data/
 __pycache__/
+Data/test.csv
+test.py
+*.csv
+*.csv#

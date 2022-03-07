@@ -3,6 +3,8 @@ import yaml
 TAGFILE_PATH = 'tag.yaml'
 MAX_TAG = 10
 
+tag_statics = {}
+
 def tagfile_check(tagyaml):
     #check if tag file is correct
     if not isinstance(tagyaml,dict):
@@ -135,6 +137,10 @@ def no_tag(target_tag:list, tags:list):
             return True
     return False
 
+def print_tag_static():
+    for tag in tag_statics:
+        print(tag + ':' + str(tag_statics[tag]))
+
 def get_tags(mac_addr:str, vendor_class:str, host_name:str):
     
     passed_tags = []
@@ -195,11 +201,18 @@ def get_tags(mac_addr:str, vendor_class:str, host_name:str):
                 #check will stay at true if passed all check
                 if check_flag:
                     #add tag to success tag if any condition was fully passed 
-                    passed_tags.append(tag)              
-                    #stop checking this tag and try next tag
+                    passed_tags.append(tag)      
+
+                    #update tag_statics
+                    if tag_statics.get(tag):
+                        tag_statics[tag] = tag_statics[tag] + 1
+                    else:
+                        tag_statics[tag] = 1
+
+                    #stop checking this tag and try next tag                    
                     break 
                     
-    
+
     return passed_tags
 
 

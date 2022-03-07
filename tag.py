@@ -30,7 +30,7 @@ def with_check(target_string:list, vendor_class:str, host_name:str):
         raise BaseException("withcheck: input wrong data type")
     
     for s in target_string:
-        if s in vendor_class or s in host_name:
+        if s.lower() in vendor_class or s.lower() in host_name:
             return True
             #if a target string is in vendor class or host name
     
@@ -43,7 +43,7 @@ def without_check(target_string:list, vendor_class:str, host_name:str):
         raise BaseException("withoutcheck: input wrong data type")
 
     for s in target_string:
-        if s not in vendor_class and s not in host_name:
+        if s.lower() not in vendor_class and s.lower() not in host_name:
             #if any target string is not in vendor class and host name
             return True            
     
@@ -57,8 +57,8 @@ def exactly_with_check(target_string:list, vendor_class:str, host_name:str):
         raise BaseException("exactlywithcheck: input wrong data type")
 
     for s in target_string:
-        v = vendor_class.find(s)
-        h = host_name.find(s)
+        v = vendor_class.find(s.lower())
+        h = host_name.find(s.lower())
         vcheck = True
         hcheck = True
         if v > 0:
@@ -120,24 +120,24 @@ def mac_check(target_string:list, mac_addr:str):
     return False
 
 def has_tag(target_tag:list, tags:list):
-    #check if each target tag is in the previous tag list
-    for t in target_tag:
-        if t not in tags:
-            #if any tatget tag is not in the list
-            return False
-    return True
-
-def no_tag(target_tag:list, tags:list):
     #check if any target tag is in the previous tag list
     for t in target_tag:
-        if t in tags:
+        if t.lower() in tags:
+            #if any target tag is in the list
+            return True
+    return False
+
+def no_tag(target_tag:list, tags:list):
+    #check if any target tag is not in the previous tag list
+    for t in target_tag:
+        if t.lower() not in tags:
             #if any tatget tag is in the list
-            return False
-    return True
+            return True
+    return False
 
 def get_tags(mac_addr:str, vendor_class:str, host_name:str):
     
-    successtags = []
+    passed_tags = []
     """
     Tag structure will be like:
 
@@ -179,14 +179,13 @@ def get_tags(mac_addr:str, vendor_class:str, host_name:str):
                                         
                     elif subconditions.startswith('hastag'):
                         #send all previous tag to check if this device has a tag or not
-                        check_flag = has_tag(tagyaml[tag][conditions][subconditions],successtags)
+                        check_flag = has_tag(tagyaml[tag][conditions][subconditions],passed_tags)
                         
                     elif subconditions.startswith('notag'):
-                        check_flag = no_tag(tagyaml[tag][conditions][subconditions],successtags)
+                        check_flag = no_tag(tagyaml[tag][conditions][subconditions],passed_tags)
                                             
                     else:
-                        print("Tag file error")
-                        raise BaseException("Tag file error")
+                        raise BaseException("Tag file error: can't find subcondition")
 
                     if check_flag is False:
                         #subconditions and together
@@ -196,15 +195,12 @@ def get_tags(mac_addr:str, vendor_class:str, host_name:str):
                 #check will stay at true if passed all check
                 if check_flag:
                     #add tag to success tag if any condition was fully passed 
-                    if not isinstance(tag,str):
-                        print(tag)
-                        print(type(tag))
-                    successtags.append(tag)              
-                    #end checking this tag and try next tag
+                    passed_tags.append(tag)              
+                    #stop checking this tag and try next tag
                     break 
                     
     
-    return successtags
+    return passed_tags
 
 
 

@@ -1,7 +1,4 @@
-a = ['a','asd','ssdds']
+a = 'asdasd'
 
-b = ['asdd','asd','aasdwa']
-
-for i in a:
-    print(i not in b)
+a.startswith
         

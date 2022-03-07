@@ -1,6 +1,59 @@
-Microsoft:
+windowspc:
   con1:
-    with: [desktop]
-    without: [iphone,ipad]
-  con2:
-    with: [windows]
+    with: [desktop, pc, win]
+    without: [dhcpcd]
+    without_2: [Cam]
+
+iphone:
+  con1:
+    with: [iphone]
+iwatch:
+  con1:
+    with: [applewatch, iwatch]
+ipad:
+  con1:
+    with: [ipad]
+macbook:
+  con1:
+    with: [macbook]
+appletv:
+  con1:
+    with: [apple]
+    with_2: [tv]
+
+android:
+  con1:
+    with: [android]
+google_home:
+  con1:
+    with: [google]
+    with_2: [home]
+chrome_cast:
+  con1:
+    with: [chrome]
+    with_2: [cast]
+
+linux:
+  con1:
+    with: [linux, raspberry]
+
+camera:
+  con1:
+    with: [cam]
+
+light:
+  con1:
+    with: [light]
+
+router:
+  con1:
+    with: [openwrt, router, wlan, eth0]
+
+fan:
+  con1:
+    exactlywith: [fan]
+
+
+
+
+

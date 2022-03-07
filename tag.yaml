@@ -20,10 +20,13 @@ appletv:
   con1:
     with: [apple]
     with_2: [tv]
+apple:
+  con1:
+    hastag: [iphone, iwatch, ipad, macbook, appletv]
 
 android:
   con1:
-    with: [android]
+    with: [android, galaxy]
 google_home:
   con1:
     with: [google]
@@ -53,7 +56,17 @@ fan:
   con1:
     exactlywith: [fan]
 
+iot:
+  con1:
+    hastag: [camera, light, fan]
 
+robot:
+  con1:
+    with: [robot]
+
+huawai:
+  con1:
+    with: [huawai]
 
 
 

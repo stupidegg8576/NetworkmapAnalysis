@@ -1,59 +1,66 @@
 import pandas
+import time
 
 #setting
-#how many times find in data to be count as a new tag
-COUNT_AS_TAG = 3
+MIN_STRING_LEN = 4
 
-tags = {}
 
-def tag_search(device_data:list, max_search:int = 10000) -> dict:
+
+def tag_search(device_data:list, max_search:int = 0) -> dict:
+    tags = {} 
     n = 0
+    l = '/' + str(len(device_data))
     for device in device_data:
         #max loop times
         n = n + 1
+        
+
         if max_search != 0 and n >= max_search:
             break
 
         if not n % 10:
-            print("tag_search: " + str(n))
+            print("tag_search: " + str(n) + l ,end='\r')
 
-        for start in range(0,len(device)-3):
-            #mim string long = 3
-            end = len(device)
+        if device in tags:
+            #if already in dictionary, pass 
+            continue
 
-            while end >= start + 3:
-                if search_tag_dict(device[start:end]):
-                    #already in dictionary, pass
-                    break
-
-                t = search_device_data(device_data,device[start:end])
-                
-                if t > COUNT_AS_TAG:
-                    tags[device[start:end]] = t
-
-                end = end - 1
-
-    return tags
-
-
-def search_device_data(device_data:list, target:str,max:int = 10000) -> int:
-    count = 0
+        else:
+            #mim string long = 4
+            for start in range(0,len(device) - MIN_STRING_LEN):                
+                for end in range(len(device), start + MIN_STRING_LEN, -1):
+                    if device[start:end] in tags:
+                        #if already in dictionary, pass
+                        break
+                    else:                        
+                        t = search_device_data(device_data,device[start:end])
+                        tags[device[start:end]] = t
+    
+    print("\nRemoving useless tags")
+    #sort tag by device number
+    tags = dict(sorted(tags.items(),key= lambda item: item[1], reverse=True)) 
+    temp = {}
     n = 0
-    for device in device_data:
+    l = '/' + str(len(tags))
+    for t in tags:
         n = n + 1
-        if max != 0 and n > max:
-            return count
+        if not n % 1000:
+            print("Removing: " + str(n) + l ,end='\r')
+
+        if tags[t] > 4:
+            temp[t] = tags[t]
+        else:
+            break
+
+    print("\nTag search done!")    
+    return temp
+
+
+def search_device_data(device_data:list, target:str) -> int:
+    count = 0
+    for device in device_data:
         if target in device:
             count = count + 1
-    return count
-            
-def search_tag_dict(target:str) -> str:
-    #search if target is any existing tag's substring
-    for tag in tags:
-        if target in tag:
-            return tag
-    #return '' if none
-    return ''
-
+    return count            
 
     

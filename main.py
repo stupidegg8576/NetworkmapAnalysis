@@ -1,11 +1,12 @@
 import pandas
-import tag_apply
+#import tag_apply
 import tag_searching 
+import tag_filtering
 
 #setting
 #device_list.csv
 INPUT_DATA_PATH = "Data\\device_vh.csv"
-OUTPUT_DATA_PATH = "Data\\result.csv"
+OUTPUT_DATA_PATH = "Data\\tagfiltered.csv"
 
 #Read Device list file
 def read_device_data_file(data_path:str):
@@ -16,7 +17,13 @@ def read_device_data_file(data_path:str):
     print("Read Device list : " + data_path)
     return device_data
 
-def apply_tag(device_data:pandas.DataFrame, max_check:int = 10000):
+def write_result_file(data_path:str, data):
+    try:
+        pandas.read_csv(data_path,on_bad_lines='skip',delimiter=';')    
+    except Exception:
+        raise FileExistsError("write result file failed : " + data_path)
+
+def apply_tag(device_data:pandas.DataFrame, max_check:int = 0):
     n = 0
     output_file = pandas.DataFrame(device_data)
     
@@ -42,27 +49,46 @@ def apply_tag(device_data:pandas.DataFrame, max_check:int = 10000):
     
     return output_file 
 
-def search_tag(device_data:pandas.DataFrame, max_search:int = 10000):
+def search_tag(device_data:pandas.DataFrame, max_search:int = 0):
     #searching common substring as tags
     #output_file = pandas.DataFrame(tag_searching.tag_search(device_data, max_search=max_search))
     #vendor_tag = tag_searching.tag_search(device_data.loc[:,'Vendor_Class'].to_list())
-    host_list = []
+    device_list = []
     for t in device_data.loc[:,'Host_Name'].to_list():
-        host_list.append(t.strip())
+        t = t.strip()
+        if t != '':
+            device_list.append(t.strip())
+    for t in device_data.loc[:,'Vendor_Class'].to_list():
+        t = t.strip()
+        if t != '':
+            device_list.append(t.strip())
 
+    return tag_searching.tag_search(device_list,max_search)
+         
+def filter_tag(tag_data:dict, max_search:int = 0) -> dict:
 
-    host_tag = tag_searching.tag_search(host_list,max_search=1000)
-    host_tag = dict(sorted(host_tag.items(),key= lambda item: item[1], reverse=False))
+    return tag_filtering.tag_filter(tag_data, max_search)
+
+def convert_to_lower(device_data:pandas.DataFrame) -> pandas.DataFrame:
     
-    for i in host_tag:
-        print(i + " : " + str(host_tag[i]))
-    return 
-    
+    for a in device_data.columns:
+        device_data[a] = device_data[a].str.lower()
+    return device_data
+        
 
 if __name__ == '__main__':
-    device_data = read_device_data_file(INPUT_DATA_PATH)
-    search_tag(device_data)
+
+    device_DataFrame = read_device_data_file(INPUT_DATA_PATH)
+    device_DataFrame = convert_to_lower(device_DataFrame)
+    search_result = search_tag(device_DataFrame, max_search=0)
+    filtered_tag = filter_tag(search_result, max_search=0)
+    output_file = pandas.DataFrame(filtered_tag, index=['Count']).rename_axis('Tag', axis=1).transpose().reset_index()
+    print(output_file)
+    output_file.to_csv(OUTPUT_DATA_PATH, sep=';')        
+   
+        
+    #output_file = pandas.DataFrame(filter_tag(device_data),index=['Count']).rename_axis('Name', axis=1).transpose().reset_index()
     #output_file = search_tag(device_data)
     #output_file = apply_tag(device_data, max_check=0)
-    #output_file.to_csv(OUTPUT_DATA_PATH)
+    #
     #tag_apply.print_tag_static()

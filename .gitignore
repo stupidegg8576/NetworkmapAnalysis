@@ -1,0 +1,8 @@
+Data/
+__pycache__/
+Data/test.csv
+test.py
+*.csv
+*.csv#
+test.yaml
+testyaml.py

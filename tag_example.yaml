@@ -1,0 +1,21 @@
+#Device list data is like:
+#ID   MAC   Vendor_Class  Host_name
+#int  str   str           str
+
+apple: #tag name, (Case sensitive?)
+  con1: #conditions: 'con' + 12345....whatever
+    #each sub condition will be AND together
+
+    with: [apple,Apple]  #if target string is in Vendor_Class and Host_name
+    without: [MS]   #if target string is NOT in Vendor_Class and Host_name
+    exactlywith: [APPLE]  #if target string is in 
+                        #AND there is no other letter infront and behind target string
+ 
+    mac: [XX:XX:XX:XX:XX:XX]  #compare mac addr, X mean whatever
+
+    hastag: [iphone]  #has the tag
+    notag: [MS]       #doesn't has the tag
+
+  con2: #conditions will be OR with each others
+        #so if one device satisfied any of one conditions will get that tag
+    with: [ipad]

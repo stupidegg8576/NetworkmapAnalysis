@@ -2,9 +2,6 @@ import pandas
 import yaml
 import func
 
-TAGFILE_PATH = 'tag.yaml'
-
-tag_statics = {}
 
 def tagfile_check(tagyaml:pandas.DataFrame):
     #check if tag file is correct
@@ -33,7 +30,7 @@ def with_check(target_string:list, vendor_class:str, host_name:str):
         raise BaseException("withcheck: input wrong data type")
     
     for s in target_string:
-        if s.lower() in vendor_class or s.lower() in host_name:
+        if s in vendor_class or s in host_name:
             return True
             #if a target string is in vendor class or host name
     
@@ -46,12 +43,12 @@ def without_check(target_string:list, vendor_class:str, host_name:str):
         raise BaseException("withoutcheck: input wrong data type")
 
     for s in target_string:
-        if s.lower() not in vendor_class and s.lower() not in host_name:
-            #if any target string is not in vendor class and host name
-            return True            
+        if s in vendor_class or s in host_name:
+            #if any target string is in vendor class and host name
+            return False            
     
-    #all target string is in vendor class or host name
-    return False 
+    #all target string is not in vendor class or host name
+    return True 
    
 def exactly_with_check(target_string:list, vendor_class:str, host_name:str):
     #check if vendor calss or host name contain target strings 
@@ -136,8 +133,8 @@ def mac_between(target_mac_range:list, mac_addr:str):
         return False
 
     for c in range(len(mac_addr)):
-        if  (target_mac_range[0][c] is not 'x' and target_mac_range[0][c] > mac_addr[c]) or \
-            (target_mac_range[1][c] is not 'x' and target_mac_range[1][c] < mac_addr[c]):
+        if  (target_mac_range[0][c] != 'x' and target_mac_range[0][c] > mac_addr[c]) or \
+            (target_mac_range[1][c] != 'x' and target_mac_range[1][c] < mac_addr[c]):
             #target_mac_range[0] <= mac addr <= target_mac_range[1]
             return False
     #pass 
@@ -163,10 +160,10 @@ def print_tag_static():
     for tag in tag_statics:
         print(tag + ':' + str(tag_statics[tag]))
 
-def get_tags(mac_addr:str, vendor_class:str, host_name:str):
+def get_tags(tagyaml, mac_addr:str, vendor_class:str, host_name:str):
     #input a device info
     #check if its info match any tag's condition in tag file
-    passed_tags = []
+    device_tags = []
     """
     Tag structure will be like:
 
@@ -208,10 +205,10 @@ def get_tags(mac_addr:str, vendor_class:str, host_name:str):
                                         
                     elif subconditions.startswith('hastag'):
                         #send all previous tag to check if this device has a tag or not
-                        check_flag = has_tag(tagyaml[tag][conditions][subconditions], passed_tags)
+                        check_flag = has_tag(tagyaml[tag][conditions][subconditions], device_tags)
                         
                     elif subconditions.startswith('notag'):
-                        check_flag = no_tag(tagyaml[tag][conditions][subconditions], passed_tags)
+                        check_flag = no_tag(tagyaml[tag][conditions][subconditions], device_tags)
                                             
                     else:
                         raise BaseException("Tag file error: can't find subcondition")
@@ -223,30 +220,63 @@ def get_tags(mac_addr:str, vendor_class:str, host_name:str):
                         
                 #check will stay at true if passed all check
                 if check_flag:
-                    #add tag to success tag if any condition was fully passed 
-                    passed_tags.append(tag)      
-
+                    #add tag to device_tags if any condition was fully passed 
+                    device_tags.append(tag)      
+                    '''
                     #update tag_statics
                     if tag_statics.get(tag):
                         tag_statics[tag] = tag_statics[tag] + 1
                     else:
-                        tag_statics[tag] = 1
-
+                        tag_statics[tag] = 1'''                        
                     #stop checking this tag and try next tag                    
-                    break 
-                    
+                    break                     
 
-    return passed_tags
+    return device_tags
+
+def apply_tag(device_data:pandas.DataFrame, tag_data_path:str, max_check:int=0) -> pandas.DataFrame:
+    
+    tagyaml = read_tag_data_file(tag_data_path)
+    
+    n = 0
+    device_with_tag = {}
+    device_without_tag = {}
+    print("Apply tags..")
+    l = ' / ' + str(len(device_data))
+
+    for device in device_data.iloc():
+        #max 
+        if (max_check != 0) and (n > max_check):
+            break 
+        
+        if not n % 100:
+            print(str(n) + l,end='\r')
+        n = n + 1
+        #for each device in data, send MAC, Vendor Class, Host Name, tags[] to get_tags()
+        #get_tags() return a list of string of tags
+        #convert all string to lower case temporary to avoid case sensitive
+        tags = get_tags(tagyaml, '', device[0], device[1])
+        if tags:
+            device_with_tag[n] = [device[0], device[1]]
+            for tag in tags:
+                device_with_tag[n].append(tag)
+        else:
+            device_without_tag[n] = [device[0], device[1]]
+    print("")
+
+    return device_with_tag, device_without_tag
 
 
+def read_tag_data_file(tag_data_path:str):
+    try:
+        #read tagfile
+        tag_file = open(tag_data_path,'r')    
+    except Exception:
+        raise IOError("Tagfile Read Failed : " + tag_data_path)
 
-try:
-    #read tagfile
-    file = open(TAGFILE_PATH,'r')    
-except Exception:
-    raise BaseException("Tagfile Read Failed : " + TAGFILE_PATH)
+    print("Read tagfile : " + tag_data_path)
 
-print("Read tagfile : " + TAGFILE_PATH)
+    tagyaml = yaml.load(tag_file, Loader=yaml.CLoader)
+    #check tag data is in right format
+    tagfile_check(tagyaml)
 
-tagyaml = yaml.load(file,Loader=yaml.CLoader)
-tagfile_check(tagyaml)
+    return tagyaml

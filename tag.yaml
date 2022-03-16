@@ -1,72 +1,59 @@
-windowspc:
+iot:
   con1:
-    with: [desktop, pc, win]
-    without: [dhcpcd]
-    without_2: [Cam]
+    with: [ cam, light, -fan-, home, chromecast, yeelink, _miap, _miio, _mibt, smart,
+            room, philips, airpurifier, audio, bedroom, nest-, esp_, esp-, sound, lgweb, udhcp,
+            shellyswitch, aa01a, chuangmi, ring, espressif, roku, sonos, wlan, amazon,
+            google, haier, mitv, diskstation, pioneer, printer, thermostat, xbox, robo,
+            hub, chime, stair, ps5, ecobee, floor, nas, kitchen, washer, mysimplelink, gateway,
+            netatmo, broadlink, leviton, shelly, leviton-device, tmall-genie, broadlink]
 
-iphone:
+desktop:
   con1:
-    with: [iphone]
-iwatch:
+    with: [desktop]
+desktop2:
   con1:
-    with: [applewatch, iwatch]
-ipad:
+    with: [desktop]
+desktop3:
   con1:
-    with: [ipad]
-macbook:
+    with: [desktop]
+desktop4:
   con1:
-    with: [macbook]
-appletv:
+    with: [desktop]
+windows:
   con1:
-    with: [apple]
-    with_2: [tv]
+    with: [desktop, pc, win, msft 5.0, laptop, nb, hp, lenovo]
+    without: [dhcpcd]
+    notag: [iot]
+
 apple:
   con1:
-    hastag: [iphone, iwatch, ipad, macbook, appletv]
+    with: [iphone, iwatch, ipad, macbook, apple, mbp, imac]
+    without: [android]
+    notag: [iot]
 
 android:
   con1:
-    with: [android, galaxy]
-google_home:
-  con1:
-    with: [google]
-    with_2: [home]
-chrome_cast:
-  con1:
-    with: [chrome]
-    with_2: [cast]
+    with: [android, galaxy, huawei, android-dhcp, samsung, redmi, pixel, oppo, oneplus,
+           watch, honor_, note, xiaomi, vivo, -s, phone, realme, nexus, linux, nova_,
+           zenfone, s1, s2]  
+    
+    without: [apple]
+    notag: [iot]
 
 linux:
   con1:
-    with: [linux, raspberry]
+    with: [raspberrypi, virtualbox, linux, nas]
 
-camera:
+tesla:
   con1:
-    with: [cam]
+    with: [tesla]
+car:
+  con1:
+    with: [tesla, car]
 
-light:
-  con1:
-    with: [light]
 
-router:
-  con1:
-    with: [openwrt, router, wlan, eth0]
 
-fan:
-  con1:
-    exactlywith: [fan]
 
-iot:
-  con1:
-    hastag: [camera, light, fan]
-
-robot:
-  con1:
-    with: [robot]
-
-huawai:
-  con1:
-    with: [huawai]
 
 
 

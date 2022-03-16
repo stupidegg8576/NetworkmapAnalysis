@@ -16,7 +16,7 @@ def count_as_diff_tag(a:int, b:int):
     else:
         return ((b - a)/ b) > AS_DIFF_TAG
 
-def tag_filter(tag_data:dict, max_search:int = 0) -> pandas.DataFrame:
+def tag_filter(tag_data:dict, max_search:int = 0) -> dict:
     print("Tag filtering")
     n = 0
     l = ' / ' + str(len(tag_data))

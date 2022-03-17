@@ -21,82 +21,65 @@ def tagfile_check(tagyaml:pandas.DataFrame):
                     #with: "[apple,ipad]" this will be tagyaml[tag][conditions][subconditions]
                     if not isinstance(tagyaml[tag][conditions][subconditions],list):
                         raise BaseException("Tagfile Check Failed")
-    
+                    #convert to lower case
+                    tagyaml[tag][conditions][subconditions] = [t.replace(t, t.lower()) for t in tagyaml[tag][conditions][subconditions]]
+                    
     print("Tagfile Check Pass")
 
-def with_check(target_string:list, vendor_class:str, host_name:str):
+def with_check(target_string:list, device:str):
     #check if vendor calss or host name contain any target strings 
-    if type(target_string) is not list or type(vendor_class) is not str or type(host_name) is not str:
+    if type(target_string) is not list or type(device) is not str:
         raise BaseException("withcheck: input wrong data type")
     
     for s in target_string:
-        if s in vendor_class or s in host_name:
+        if s in device:
             return True
             #if a target string is in vendor class or host name
     
     #doesn't contain any target string
     return False 
     
-def without_check(target_string:list, vendor_class:str, host_name:str):
+def without_check(target_string:list, device:str):
     #check if vendor calss or host name contain any target strings 
-    if type(target_string) is not list or type(vendor_class) is not str or type(host_name) is not str:
+    if type(target_string) is not list or type(device) is not str:
         raise BaseException("withoutcheck: input wrong data type")
 
     for s in target_string:
-        if s in vendor_class or s in host_name:
+        if s in device:
             #if any target string is in vendor class and host name
             return False            
     
     #all target string is not in vendor class or host name
     return True 
    
-def exactly_with_check(target_string:list, vendor_class:str, host_name:str):
+def exactly_with_check(target_string:list, device:str):
     #check if vendor calss or host name contain target strings 
     #and no other letters infront or behind target strings
-    if type(target_string) is not list or type(vendor_class) is not str or type(host_name) is not str:
+    if type(target_string) is not list or type(device) is not str:
         raise BaseException("exactlywithcheck: input wrong data type")
 
     for s in target_string:
-        v = vendor_class.find(s.lower())
-        h = host_name.find(s.lower())
-        vcheck = True
-        hcheck = True
-        if v > 0:
+        i = device.find(s)
+        check = True
+        if i > 0:
             #contain s
-            if v == 0:
-                #s is at start of v, skip check infront
+            if i == 0:
+                #s is at start of i, skip check infront
                 pass
-            elif vendor_class[v-1].isalpha():
+            elif device[i-1].isalpha():
                 #the char infront s is a letter
-                vcheck = False
-            if v + len(s) == len(vendor_class):
+                check = False
+            if i + len(s) == len(device):
                 #s is at the last char of vendor_class
                 pass
-            elif vendor_class[v-1].isalpha():
+            elif device[i-1].isalpha():
                 #the char after s is a letter
-                vcheck = False                
+                check = False                
         else:
             #doesn't contain s
-            vcheck = False
-        if h > 0:
-            #contain s
-            if h == 0:
-                #s is at start of h, skip check infront
-                pass
-            elif host_name[h-1].isalpha():
-                #the char infront s is a letter
-                hcheck = False
-            if h + len(s) == len(host_name):
-                #s is at the last char of host_name
-                pass
-            elif host_name[v-1].isalpha():
-                #the char after s is a letter
-                hcheck = False                
-        else:
-            #doesn't contain s
-            hcheck = False
+            check = False
 
-        if vcheck or hcheck:
+        if check:
             #a target string exactly in vendor class or host name
             return True
 
@@ -160,7 +143,7 @@ def print_tag_static():
     for tag in tag_statics:
         print(tag + ':' + str(tag_statics[tag]))
 
-def get_tags(tagyaml, mac_addr:str, vendor_class:str, host_name:str):
+def get_tags(tagyaml, device:str):
     #input a device info
     #check if its info match any tag's condition in tag file
     device_tags = []
@@ -192,16 +175,16 @@ def get_tags(tagyaml, mac_addr:str, vendor_class:str, host_name:str):
                     #with or without or ...
                     
                     if subconditions.startswith('without'):
-                        check_flag = without_check(tagyaml[tag][conditions][subconditions], vendor_class, host_name)
+                        check_flag = without_check(tagyaml[tag][conditions][subconditions], device)
                     
                     elif subconditions.startswith('with'):
-                        check_flag = with_check(tagyaml[tag][conditions][subconditions], vendor_class, host_name)
+                        check_flag = with_check(tagyaml[tag][conditions][subconditions], device)
                     
                     elif subconditions.startswith('exactlywith'):
-                        check_flag = exactly_with_check(tagyaml[tag][conditions][subconditions], vendor_class, host_name)
+                        check_flag = exactly_with_check(tagyaml[tag][conditions][subconditions], device)
                     
                     elif subconditions.startswith('mac'):
-                        check_flag = mac_between(tagyaml[tag][conditions][subconditions], mac_addr)
+                        check_flag = mac_between(tagyaml[tag][conditions][subconditions], device)
                                         
                     elif subconditions.startswith('hastag'):
                         #send all previous tag to check if this device has a tag or not
@@ -233,9 +216,10 @@ def get_tags(tagyaml, mac_addr:str, vendor_class:str, host_name:str):
 
     return device_tags
 
-def apply_tag(device_data:pandas.DataFrame, tag_data_path:str, max_check:int=0) -> pandas.DataFrame:
+def apply_tag(device_data:pandas.DataFrame, input_path_tag_vendor_class:str, input_path_tag_host_name:str, max_check:int=0) -> dict:
     
-    tagyaml = read_tag_data_file(tag_data_path)
+    tag_vendor_class = read_tag_data_file(input_path_tag_vendor_class)
+    tag_host_name = read_tag_data_file(input_path_tag_host_name)
     
     n = 0
     device_with_tag = {}
@@ -254,15 +238,20 @@ def apply_tag(device_data:pandas.DataFrame, tag_data_path:str, max_check:int=0) 
         #for each device in data, send MAC, Vendor Class, Host Name, tags[] to get_tags()
         #get_tags() return a list of string of tags
         #convert all string to lower case temporary to avoid case sensitive
-        tags = get_tags(tagyaml, '', device[0], device[1])
-        if tags:
-            device_with_tag[n] = [device[0], device[1]]
-            for tag in tags:
-                device_with_tag[n].append(tag)
-        else:
-            device_without_tag[n] = [device[0], device[1]]
-    print("")
 
+        tags = get_tags(tag_vendor_class, device['Vendor_Class'])
+        tagsh = get_tags(tag_host_name, device['Host_Name'])   
+        for t in tagsh:
+            if t not in tags:
+                tags.append(t)
+        
+        #if a device has tag, add it to device_with_tag      
+        if tags:
+            device_with_tag[n] = [device['Vendor_Class'], device['Host_Name']] + tags
+        else:
+            device_without_tag[n] = [device['Vendor_Class'], device['Host_Name']]
+    
+    print("")
     return device_with_tag, device_without_tag
 
 

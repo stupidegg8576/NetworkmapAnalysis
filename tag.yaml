@@ -6,19 +6,6 @@ iot:
             google, haier, mitv, diskstation, pioneer, printer, thermostat, xbox, robo,
             hub, chime, stair, ps5, ecobee, floor, nas, kitchen, washer, mysimplelink, gateway,
             netatmo, broadlink, leviton, shelly, leviton-device, tmall-genie, broadlink]
-
-desktop:
-  con1:
-    with: [desktop]
-desktop2:
-  con1:
-    with: [desktop]
-desktop3:
-  con1:
-    with: [desktop]
-desktop4:
-  con1:
-    with: [desktop]
 windows:
   con1:
     with: [desktop, pc, win, msft 5.0, laptop, nb, hp, lenovo]
@@ -44,12 +31,6 @@ linux:
   con1:
     with: [raspberrypi, virtualbox, linux, nas]
 
-tesla:
-  con1:
-    with: [tesla]
-car:
-  con1:
-    with: [tesla, car]
 
 
 

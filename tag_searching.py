@@ -1,4 +1,3 @@
-
 def tag_search(device_without_tag:list, device_list:list, max_search:int = 0, minimum_search_string_len:int = 3) -> dict:
     #for all device_without_tag, search all other device in device list 
     #try to find keywords for generating new tag

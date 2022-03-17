@@ -21,11 +21,3 @@ android:
 linux:
   con1:
     with: [raspberrypi, linux]
-
-
-
-
-
-
-
-

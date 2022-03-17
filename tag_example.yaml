@@ -2,44 +2,20 @@
 #ID   MAC   Vendor_Class  Host_name
 #int  str   str           str
 
-
-apple: #tag name, (Case sensitive)
+apple: #tag name, (Case sensitive?)
   con1: #conditions: 'con' + 12345....whatever
-        #each subcondition in con1 will be AND together
+    #each sub condition will be AND together
 
-    with: [apple,ipad,iphone]  
-      #if any target string is in Vendor_Class or Host_name
-      #pass if contain 'apple', 'ipad' or 'iphone'
-    without: [ms, microsoft]   
-      #if any target string is NOT in Vendor_Class and Host_name
-      #pass if 'ms' or 'microsoft' is not in Vendor_Class and Host_name
-    exactlywith: [apple]  
-      #if any target string is exactly in Vendor_Class or Host_name
-      #exactly in means no other letter infront or behind target string
-      #like 'my apple' will pass, 'mymanYappleS' will fail
-      #TO DO:may cause something bad when Target strings too short
+    with: [apple,Apple]  #if target string is in Vendor_Class and Host_name
+    without: [MS]   #if target string is NOT in Vendor_Class and Host_name
+    exactlywith: [APPLE]  #if target string is in 
+                        #AND there is no other letter infront and behind target string
+ 
+    mac: [XX:XX:XX:XX:XX:XX]  #compare mac addr, X mean whatever
 
-    mac: [XX:XX:XX:XX:XX:XX,00:11:22:33:XX:XX]
-      #compare mac addr, X mean whatever
-      #success if any MAC addr were matched
-      #TO DO: support mac addr in range
-      #00:11:22:33:XX:XX ~ 00:11:22:44:XX:XX
-
-    hastag: [iphone]
-      #has any target tag
-      #only search previous tag, so tag order will affect
-    notag: [MS]
-      #doesn't have all target tag
-      #only search previous tag, so tag order will affect
+    hastag: [iphone]  #has the tag
+    notag: [MS]       #doesn't has the tag
 
   con2: #conditions will be OR with each others
         #so if one device satisfied any of one conditions will get that tag
-
-        #can have same subcondition but with diffrent name
-        #like:
-    with_1: [my]
-    with_2: [iphone]
-        #their name need to start with 'with' or 'without' or other
-        #their result will be AND together
-        #so it has to have both 'my' and 'iphone' in name to pass
-
+    with: [ipad]

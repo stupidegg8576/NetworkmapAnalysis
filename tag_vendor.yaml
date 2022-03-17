@@ -1,0 +1,33 @@
+iot:
+  con1:
+    with: [ cam, light, -fan-, home]
+
+windows:
+  con1:
+    with: [msft, microsoft]
+    notag: [iot]
+
+apple:
+  con1:
+    with: [iphone, iwatch, ipad, macbook, apple, mbp, imac]
+    without: [android]
+    notag: [iot]
+
+android:
+  con1:
+    with: [android, galaxy, huawei, android-dhcp, Google] 
+    without: [apple]
+    notag: [iot]
+
+linux:
+  con1:
+    with: [linux]
+
+
+
+
+
+
+
+
+

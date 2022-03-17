@@ -8,7 +8,7 @@ MIN = 5
 #threshold of counting as a diffrent tag
 AS_DIFF_TAG = 0.2
 
-clean_data = {}
+
 
 def count_as_diff_tag(a:int, b:int):
     if a > b:
@@ -17,20 +17,20 @@ def count_as_diff_tag(a:int, b:int):
         return ((b - a)/ b) > AS_DIFF_TAG
 
 def tag_filter(tag_data:dict, max_search:int = 0) -> dict:
+    clean_data = {}
     print("Tag filtering")
     n = 0
     l = ' / ' + str(len(tag_data))
     for tag in tag_data:
         #tag = tag name
-        #tag_data[tag] = the number of device has this tag        
-        n = n + 1
+        #tag_data[tag] = the number of device has this tag
         
         if not n % 1000:
             print(str(n) + l, end= '\r')
-        
         if max_search != 0 and n >= max_search:
             break
-
+        n = n + 1
+        
         is_a_new_tag = True
         for another_tag in tag_data:            
             #if tag is another_tag's substring and two tag's devices number diffirence is not big

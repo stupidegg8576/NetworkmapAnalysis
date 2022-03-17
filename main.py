@@ -4,7 +4,7 @@ import tag_searching
 import tag_filtering
 import sys
 import getopt
-
+import yaml
 
 #Read Device list file
 def read_device_data_file(data_path:str):
@@ -21,111 +21,155 @@ def write_result_file(data_path:str, data):
     except Exception:
         raise FileExistsError("write result file failed : " + data_path)
 
-def apply_tag(device_data:pandas.DataFrame, tag_data_path:str, max_search:int = 0) -> pandas.DataFrame:
-    device_with_tag, device_without_tag = tag_apply.apply_tag(device_data, tag_data_path, max_search)
+def apply_tag(device_data:pandas.DataFrame, input_path_tag_vendor_class:str, input_path_tag_host_name:str, max_search:int = 0) -> dict:
+    device_with_tag, device_without_tag = tag_apply.apply_tag(device_data, input_path_tag_vendor_class, input_path_tag_host_name, max_search)
     return device_with_tag, device_without_tag 
 
-def search_tag(device_data:pandas.DataFrame, max_search:int = 0):
-    #searching common substring as tags
-    #output_file = pandas.DataFrame(tag_searching.tag_search(device_data, max_search=max_search))
-    #vendor_tag = tag_searching.tag_search(device_data.loc[:,'Vendor_Class'].to_list())
-    print(device_data)
-    device_list = []
-    for t in device_data.loc[:,'Host_Name'].to_list():
-        t = t.strip()
-        if t != '':
-            device_list.append(t.strip())
-    for t in device_data.loc[:,'Vendor_Class'].to_list():
-        t = t.strip()
-        if t != '':
-            device_list.append(t.strip())
+def search_tag(device_without_tag:pandas.DataFrame, device_list:pandas.DataFrame, max_search:int = 0, minimum_search_string_len:int = 3):
+    #split vendor_class and host_name to search new tag
+    device_without_tag_vendor_class = []
+    device_without_tag_host_name = []
+    device_list_vendor_class = []
+    device_list_host_name = []
 
-    return tag_searching.tag_search(device_list,max_search)
+    for t in device_without_tag.loc[:,'Vendor_Class'].to_list():
+        t = t.strip()
+        if t != '':
+            device_without_tag_vendor_class.append(t)
+    for t in device_list.loc[:,'Vendor_Class'].to_list():
+        t = t.strip()
+        if t != '':
+            device_list_vendor_class.append(t)    
+    print("searching new Vendor_class tag")
+    vendor_class_tag = tag_searching.tag_search(device_without_tag_vendor_class, device_list_vendor_class, max_search, minimum_search_string_len)
+    
+    for t in device_without_tag.loc[:,'Host_Name'].to_list():
+        t = t.strip()
+        if t != '':
+            device_without_tag_host_name.append(t)
+    for t in device_list.loc[:,'Host_Name'].to_list():
+        t = t.strip()
+        if t != '':
+            device_list_host_name.append(t)
+    print("searching new Host_name tag")
+    host_name_tag = tag_searching.tag_search(device_without_tag_host_name, device_list_host_name, max_search, minimum_search_string_len)
+
+    
+    return vendor_class_tag, host_name_tag
          
 def filter_tag(tag_data:dict, max_search:int = 0) -> dict:
 
     return tag_filtering.tag_filter(tag_data, max_search)
 
 def convert_to_lower_case(device_data:pandas.DataFrame) -> pandas.DataFrame:
-    
-    for a in device_data.columns:
-        device_data[a] = device_data[a].str.lower().str.strip()
+    #convert to lower case and cut off blank space at string end
+    device_data['Vendor_Class'] = device_data['Vendor_Class'].str.lower().str.strip()
+    device_data['Host_Name'] = device_data['Host_Name'].str.lower().str.strip()
     return device_data
-        
+
+def get_setting():
+
+    setting = {}
+    #default settings
+    setting['maximum_search'] = 0
+    setting['minimum_search_string_len'] = 3
+    setting['ratio_count_as_different_tag'] = 0.2
+    setting['input_path_tag_vendor_class'] = 'tag_vendor.yaml'
+    setting['input_path_tag_host_name'] = 'tag_host.yaml'
+    setting['input_path_device_data'] = '.\\Data\\device_list.csv'
+    setting['output_path_device_with_tag'] = '.\\Data\\device_device_with_tag.csv'
+    setting['output_path_device_without_tag'] = '.\\Data\\device_without_tag.csv'
+    setting['output_path_vendor_class_new_tag'] = '.\\Data\\vendor_class_new_tag.csv'
+    setting['output_path_host_name_new_tag'] = '.\\Data\\host_name_new_tag.csv'
+    
+    try:
+        #read tagfile
+        setting_file = open('setting.yaml','r')    
+    except Exception:
+        print("Tagfile Read Failed : " + 'setting.yaml')
+        print("Using default setting")
+        return setting
+
+    print("Read setting file: " + 'setting.yaml')
+
+    #update setting
+    setting.update(yaml.load(setting_file, Loader=yaml.CLoader))
+
+    return setting   
 
 if __name__ == '__main__':
-    sys.argv = ['.\\main.py', '-i', '.\\Data\\device_vh.csv', '-t', '.\\tag.yaml', '-n', '.\\Data\\New_tag.csv', \
-                    '-o', '.\\Data\\Device_with_tag.csv', '-u', '.\\Data\\Device_without_tag.csv', '-m', '100']
+    #load setting
+    setting = get_setting() 
+
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "i:t:o:u:n:m:", ["input_file=", "input_tag_data=", \
-                                                "output_with_tag=", "output_without_tag=", "output_new_tag", "maximum_search="])
+        opts, args = getopt.getopt(sys.argv[1:], "i:v:h:o:u:n:", ["input_path_device_data=", "input_path_tag_vendor_class=", "input_path_tag_host_name=" \
+                                                "output_path_device_with_tag=", "output_path_device_without_tag=", "output_path_new_tag"])
     except getopt.GetoptError:
         print("Something wrong with opts")
         raise getopt.GetoptError("Something wrong with opts")
-    
-    maximum_search = 0
-    print(opts)
-    
 
+    #update setting if using args
     for i in opts:
         if len(i) < 2:
             raise getopt.GetoptError("Something wrong with opts")
         if i[0] == '-i':
-            input_device_data_path = i[1]
-        elif i[0] == '-t':
-            input_tag_data_path = i[1]
+            setting['input_path_device_data'] = i[1]
+        elif i[0] == '-v':
+            setting['input_path_tag_vendor_class'] = i[1]
+        elif i[0] == '-h':
+            setting['input_path_tag_host_name'] = i[1]
         elif i[0] == '-o':
-            output_path_device_with_tag = i[1]
+            setting['output_path_device_with_tag'] = i[1]
         elif i[0] == '-u':
-            output_path_device_without_tag = i[1]
+            setting['output_path_device_without_tag'] = i[1]
         elif i[0] == '-n':
-            output_path_new_tag = i[1]
-        elif i[0] == '-m':
-            try:
-                maximum_search = int(i[1])
-            except ValueError:
-                raise getopt.GetoptError("opt: maximum search error")            
+            setting['output_path_new_tag'] = i[1]        
         else:
-            print("FGDFG")
             print(i)
             raise getopt.GetoptError("Something wrong with opts")
-
+    
     #read device data(only with vendor and host name)
-    device_DataFrame = read_device_data_file(input_device_data_path)
+    device_DataFrame = read_device_data_file(setting['input_path_device_data'])
+
     #conver to lower case
     device_DataFrame = convert_to_lower_case(device_DataFrame)
-
-    #apply tag in tag file to all device 
-    device_with_tag, device_without_tag = apply_tag(device_DataFrame, input_tag_data_path, maximum_search)    
     
-    #save the result
+    #apply tag in tag file to all device 
+    #apply_tag will return 2 dict with [vendor_class, host_name] or [vendor_class, host_name, tag1, tag2....]
+    device_with_tag, device_without_tag = apply_tag(device_DataFrame, setting['input_path_tag_vendor_class'], setting['input_path_tag_host_name'], setting['maximum_search'])    
+    
+    #convert dict to pandas.DataFrame
     device_with_tag = pandas.DataFrame.from_dict(device_with_tag, orient='index') 
     device_without_tag = pandas.DataFrame.from_dict(device_without_tag, orient='index')
     
-    #creat index list
+    #creat index list for saving file
     index=['Vendor_Class','Host_Name']
+
+    #device_without_tag only have ['Vendor_Class','Host_Name']
     device_without_tag.set_axis(index, axis='columns', inplace=True)
-    for i in range(2,device_with_tag.columns.stop):
-        index.append('Tag_' + str(i-1))
-    device_with_tag.set_axis(index, axis='columns', inplace=True)
+
+    #device_tag may has many tags, so add tags at end of index
+    if device_with_tag.columns.size:
+        for i in range(2,device_with_tag.columns.size):
+            index.append('Tag_' + str(i-1))
+        device_with_tag.set_axis(index, axis='columns', inplace=True)
     
     #output to .csv
-    device_with_tag.to_csv(output_path_device_with_tag, sep=';', index=False)  
-    device_without_tag.to_csv(output_path_device_without_tag, sep=';', index=False)  
+    device_with_tag.to_csv(setting['output_path_device_with_tag'], sep=';', index=False)  
+    device_without_tag.to_csv(setting['output_path_device_without_tag'], sep=';', index=False)  
+    
+    #searching new tag in device_without_tag
+    vendor_class_new_tag, host_name_new_tag = search_tag(device_without_tag, device_DataFrame, setting['maximum_search'], setting['minimum_search_string_len'])
 
-    '''
-    #searching new tag in device has no tag
-    search_result = search_tag(device_without_tag, max_search=0)
-    filtered_tag = filter_tag(search_result, max_search=0)
-    #save new tags
-    output_file = pandas.DataFrame(filtered_tag, index=['Count']).rename_axis('Tag', axis=1).transpose().reset_index()
-    print(output_file)
-    output_file.to_csv(output_path_new_tag, sep=';')        
-   
+    #filter useless tag
+    vendor_class_new_tag = filter_tag(vendor_class_new_tag)
+    host_name_new_tag = filter_tag(host_name_new_tag)
+
+    #saving new tags to file
+    output_vendor_class_new_tag = pandas.DataFrame.from_dict(vendor_class_new_tag, orient='index') 
+    output_host_name_new_tag = pandas.DataFrame.from_dict(host_name_new_tag, orient='index') 
+    
+    output_vendor_class_new_tag.to_csv(setting['output_path_vendor_class_new_tag'], sep=';')        
+    output_host_name_new_tag.to_csv(setting['output_path_host_name_new_tag'], sep=';')  
         
-    #output_file = pandas.DataFrame(filter_tag(device_data),index=['Count']).rename_axis('Name', axis=1).transpose().reset_index()
-    #output_file = search_tag(device_data)
-    #output_file = apply_tag(device_data, max_check=0)
-    #
-    #tag_apply.print_tag_static()
-'''
+

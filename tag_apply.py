@@ -21,17 +21,17 @@ def tagfile_check(tagyaml:pandas.DataFrame):
                     #with: "[apple,ipad]" this will be tagyaml[tag][conditions][subconditions]
                     if not isinstance(tagyaml[tag][conditions][subconditions],list):
                         raise BaseException("Tagfile Check Failed")
-                    #convert to lower case
-                    tagyaml[tag][conditions][subconditions] = [t.replace(t, t.lower()) for t in tagyaml[tag][conditions][subconditions]]
+                    #convert tags to lower case
+                    tagyaml[tag][conditions][subconditions] = [keyword.replace(keyword, keyword.lower()) for keyword in tagyaml[tag][conditions][subconditions]]
                     
     print("Tagfile Check Pass")
 
-def with_check(target_string:list, device:str):
+def with_check(keyword:list, device:str):
     #check if vendor calss or host name contain any target strings 
-    if type(target_string) is not list or type(device) is not str:
+    if type(keyword) is not list or type(device) is not str:
         raise BaseException("withcheck: input wrong data type")
     
-    for s in target_string:
+    for s in keyword:
         if s in device:
             return True
             #if a target string is in vendor class or host name
@@ -39,12 +39,12 @@ def with_check(target_string:list, device:str):
     #doesn't contain any target string
     return False 
     
-def without_check(target_string:list, device:str):
+def without_check(keyword:list, device:str):
     #check if vendor calss or host name contain any target strings 
-    if type(target_string) is not list or type(device) is not str:
+    if type(keyword) is not list or type(device) is not str:
         raise BaseException("withoutcheck: input wrong data type")
 
-    for s in target_string:
+    for s in keyword:
         if s in device:
             #if any target string is in vendor class and host name
             return False            
@@ -52,13 +52,13 @@ def without_check(target_string:list, device:str):
     #all target string is not in vendor class or host name
     return True 
    
-def exactly_with_check(target_string:list, device:str):
+def exactly_with_check(keyword:list, device:str):
     #check if vendor calss or host name contain target strings 
     #and no other letters infront or behind target strings
-    if type(target_string) is not list or type(device) is not str:
+    if type(keyword) is not list or type(device) is not str:
         raise BaseException("exactlywithcheck: input wrong data type")
 
-    for s in target_string:
+    for s in keyword:
         i = device.find(s)
         check = True
         if i > 0:
@@ -86,13 +86,13 @@ def exactly_with_check(target_string:list, device:str):
     #after for loop, no any target string is exactly in vendor class or host name 
     return False 
     
-def mac_check(target_string:list, mac_addr:str):
+def mac_check(keyword:list, mac_addr:str):
     #check if Mac matched any target Mac
-    if type(target_string) is not list or type(mac_addr) is not str:
+    if type(keyword) is not list or type(mac_addr) is not str:
         raise BaseException("maccheck: input wrong data type")
 
 
-    for s in target_string:        
+    for s in keyword:        
         for i in len(s):
             if s[i] != 'X' or s[i] != 'x' or s[i] != mac_addr[i]:
                 #Fail if 'X', fail if != x and mac
@@ -123,18 +123,18 @@ def mac_between(target_mac_range:list, mac_addr:str):
     #pass 
     return True
 
-def has_tag(target_tag:list, tags:list):
+def has_tag(key_tag:list, device_tags:list):
     #check if any target tag is in the previous tag list
-    for t in target_tag:
-        if t.lower() in tags:
+    for t in key_tag:
+        if t.lower() in device_tags:
             #if any target tag is in the list
             return True
     return False
 
-def no_tag(target_tag:list, tags:list):
+def no_tag(key_tag:list, device_tags:list):
     #check if any target tag is not in the previous tag list
-    for t in target_tag:
-        if t.lower() not in tags:
+    for t in key_tag:
+        if t.lower() not in device_tags:
             #if any tatget tag is in the list
             return True
     return False
@@ -148,7 +148,7 @@ def get_tags(tagyaml, device:str):
 
     Apple: #tag name
         con1: #conditions
-            with: [apple,Apple]  #subconditions and their target strings
+            with: [apple,Apple]  #subconditions and their keywords
             without: [MicroSoft]
         con2: 
             with:[ipad]
@@ -200,7 +200,7 @@ def get_tags(tagyaml, device:str):
                 #check will stay at true if passed all check
                 if check_flag:
                     #add tag to device_tags if any condition was fully passed 
-                    device_tags.append(tag)      
+                    device_tags.append(tag.lower())      
                     '''
                     #update tag_statics
                     if tag_statics.get(tag):

@@ -1,7 +1,6 @@
 import pandas
 import tag_apply
-import tag_searching 
-import tag_filtering
+import keyword_searching 
 import sys
 import getopt
 import yaml
@@ -25,7 +24,7 @@ def apply_tag(device_data:pandas.DataFrame, input_path_tag_vendor_class:str, inp
     device_with_tag, device_without_tag = tag_apply.apply_tag(device_data, input_path_tag_vendor_class, input_path_tag_host_name, max_search)
     return device_with_tag, device_without_tag 
 
-def search_tag(device_without_tag:pandas.DataFrame, device_list:pandas.DataFrame, max_search:int = 0, minimum_search_string_len:int = 3):
+def search_new_keyword(device_without_tag:pandas.DataFrame, device_list:pandas.DataFrame, setting:dict):
     #split vendor_class and host_name to search new tag
     device_without_tag_vendor_class = []
     device_without_tag_host_name = []
@@ -40,8 +39,8 @@ def search_tag(device_without_tag:pandas.DataFrame, device_list:pandas.DataFrame
         t = t.strip()
         if t != '':
             device_list_vendor_class.append(t)    
-    print("searching new Vendor_class tag")
-    vendor_class_tag = tag_searching.tag_search(device_without_tag_vendor_class, device_list_vendor_class, max_search, minimum_search_string_len)
+    print("searching new Vendor_class keywords")
+    vendor_class_tag = keyword_searching.keyword_search(device_without_tag_vendor_class, device_list_vendor_class, setting)
     
     for t in device_without_tag.loc[:,'Host_Name'].to_list():
         t = t.strip()
@@ -51,15 +50,11 @@ def search_tag(device_without_tag:pandas.DataFrame, device_list:pandas.DataFrame
         t = t.strip()
         if t != '':
             device_list_host_name.append(t)
-    print("searching new Host_name tag")
-    host_name_tag = tag_searching.tag_search(device_without_tag_host_name, device_list_host_name, max_search, minimum_search_string_len)
-
-    
+    print("searching new Host_name keywords")
+    host_name_tag = keyword_searching.keyword_search(device_without_tag_host_name, device_list_host_name, setting)
+        
     return vendor_class_tag, host_name_tag
-         
-def filter_tag(tag_data:dict, max_search:int = 0) -> dict:
 
-    return tag_filtering.tag_filter(tag_data, max_search)
 
 def convert_to_lower_case(device_data:pandas.DataFrame) -> pandas.DataFrame:
     #convert to lower case and cut off blank space at string end
@@ -146,9 +141,12 @@ if __name__ == '__main__':
     index=['Vendor_Class','Host_Name']
 
     #device_without_tag only have ['Vendor_Class','Host_Name']
-    device_without_tag.set_axis(index, axis='columns', inplace=True)
+    #if there is data in device_without_tag
+    if device_without_tag.columns.size:
+        device_without_tag.set_axis(index, axis='columns', inplace=True)
 
     #device_tag may has many tags, so add tags at end of index
+    #if there is data in device_with_tag
     if device_with_tag.columns.size:
         for i in range(2,device_with_tag.columns.size):
             index.append('Tag_' + str(i-1))
@@ -159,17 +157,13 @@ if __name__ == '__main__':
     device_without_tag.to_csv(setting['output_path_device_without_tag'], sep=';', index=False)  
     
     #searching new tag in device_without_tag
-    vendor_class_new_tag, host_name_new_tag = search_tag(device_without_tag, device_DataFrame, setting['maximum_search'], setting['minimum_search_string_len'])
-
-    #filter useless tag
-    vendor_class_new_tag = filter_tag(vendor_class_new_tag)
-    host_name_new_tag = filter_tag(host_name_new_tag)
+    vendor_class_new_keywords, host_name_new_keywords = search_new_keyword(device_without_tag, device_DataFrame, setting)
 
     #saving new tags to file
-    output_vendor_class_new_tag = pandas.DataFrame.from_dict(vendor_class_new_tag, orient='index') 
-    output_host_name_new_tag = pandas.DataFrame.from_dict(host_name_new_tag, orient='index') 
+    output_vendor_class_new_keywords = pandas.DataFrame.from_dict(vendor_class_new_keywords, orient='index') 
+    output_host_name_new_keywords = pandas.DataFrame.from_dict(host_name_new_keywords, orient='index') 
     
-    output_vendor_class_new_tag.to_csv(setting['output_path_vendor_class_new_tag'], sep=';')        
-    output_host_name_new_tag.to_csv(setting['output_path_host_name_new_tag'], sep=';')  
+    output_vendor_class_new_keywords.to_csv(setting['output_path_vendor_class_new_keyword'], sep=';')        
+    output_host_name_new_keywords.to_csv(setting['output_path_host_name_new_keyword'], sep=';')  
         
 

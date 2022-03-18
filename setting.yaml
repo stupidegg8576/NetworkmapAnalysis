@@ -1,10 +1,11 @@
 maximum_search: 0
 minimum_search_string_len: 3
 ratio_count_as_different_tag: 0.2
-input_path_tag_vendor_class: 'tag_vendor.yaml'
-input_path_tag_host_name: 'tag_host.yaml'
+input_path_tag_vendor_class: '\\Data\\tag_vendor.yaml'
+input_path_tag_host_name: '\\Data\\tag_host.yaml'
 input_path_device_data: '.\\Data\\device_list.csv'
+input_path_keyword_blacklist: '\\Data\\keyword_blacklist.yaml'
 output_path_device_with_tag: '.\\Data\\device_device_with_tag.csv'
 output_path_device_without_tag: '.\\Data\\device_without_tag.csv'
-output_path_vendor_class_new_tag: '.\\Data\\new_tag_vendor_class.csv'
-output_path_host_name_new_tag: '.\\Data\\new_tag_host_name.csv'
+output_path_vendor_class_new_keyword: '.\\Data\\new_keyword_vendor_class.csv'
+output_path_host_name_new_keyword: '.\\Data\\new_keyword_host_name.csv'

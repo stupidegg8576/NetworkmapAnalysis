@@ -80,10 +80,11 @@ def keyword_filter(keywords_data:dict, device_list:list, setting:dict) -> dict:
         
         #check if new keyword is in keyword_blacklist
         keyword_is_in_blacklist = False
-        for black in keyword_blacklist:
-            if keyword in black:
-                keyword_is_in_blacklist = True
-                break
+        for blacklist in keyword_blacklist:
+            for blackwords in blacklist:
+                if keyword in blackwords:
+                    keyword_is_in_blacklist = True
+                    break
         #if new keyword is in keyword_blacklist, continue to next one
         if keyword_is_in_blacklist:
             continue              

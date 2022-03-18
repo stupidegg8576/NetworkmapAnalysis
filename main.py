@@ -1,6 +1,6 @@
 import pandas
 import tag_apply
-import keyword_searching 
+import keyword_search 
 import sys
 import getopt
 import yaml
@@ -40,7 +40,7 @@ def search_new_keyword(device_without_tag:pandas.DataFrame, device_list:pandas.D
         if t != '':
             device_list_vendor_class.append(t)    
     print("searching new Vendor_class keywords")
-    vendor_class_tag = keyword_searching.keyword_search(device_without_tag_vendor_class, device_list_vendor_class, setting)
+    vendor_class_tag = keyword_search.keyword_search(device_without_tag_vendor_class, device_list_vendor_class, setting)
     
     for t in device_without_tag.loc[:,'Host_Name'].to_list():
         t = t.strip()
@@ -51,7 +51,7 @@ def search_new_keyword(device_without_tag:pandas.DataFrame, device_list:pandas.D
         if t != '':
             device_list_host_name.append(t)
     print("searching new Host_name keywords")
-    host_name_tag = keyword_searching.keyword_search(device_without_tag_host_name, device_list_host_name, setting)
+    host_name_tag = keyword_search.keyword_search(device_without_tag_host_name, device_list_host_name, setting)
         
     return vendor_class_tag, host_name_tag
 

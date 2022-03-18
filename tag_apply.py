@@ -139,10 +139,6 @@ def no_tag(target_tag:list, tags:list):
             return True
     return False
 
-def print_tag_static():
-    for tag in tag_statics:
-        print(tag + ':' + str(tag_statics[tag]))
-
 def get_tags(tagyaml, device:str):
     #input a device info
     #check if its info match any tag's condition in tag file

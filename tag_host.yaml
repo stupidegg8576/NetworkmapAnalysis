@@ -1,10 +1,10 @@
 iot:
   con1:
-    with: [ cam, light, -fan-, home, chromecast, yeelink]
+    with: [ cam, light, -fan-, home, chromecast, yeelink, esp_, amazon-, _mibt, lgwebostv, plug, _miap, chuangmi]
 
 windows:
   con1:
-    with: [desktop, pc, win]
+    with: [desktop, pc, win, laptop]
     notag: [iot]
 
 apple:
@@ -14,7 +14,7 @@ apple:
 
 android:
   con1:
-    with: [android, galaxy, huawei, redmi]      
+    with: [android, galaxy, huawei, redmi, samsung, pixel-]     
     without: [apple]
     notag: [iot]
 

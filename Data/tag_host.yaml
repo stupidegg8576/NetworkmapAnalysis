@@ -1,0 +1,23 @@
+iot:
+  con1:
+    with: [ cam, light, -fan-, home, chromecast, yeelink, esp_, amazon-, _mibt, lgwebostv, plug, _miap, chuangmi]
+
+windows:
+  con1:
+    with: [desktop, pc, win, laptop]
+    notag: [iot]
+
+apple:
+  con1:
+    with: [iphone, iwatch, ipad, macbook, apple, mbp, imac]
+    notag: [iot]
+
+android:
+  con1:
+    with: [android, galaxy, huawei, redmi, samsung, pixel-]     
+    without: [apple]
+    notag: [iot]
+
+linux:
+  con1:
+    with: [raspberrypi, linux]

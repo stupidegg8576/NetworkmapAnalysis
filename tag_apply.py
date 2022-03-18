@@ -1,6 +1,5 @@
 import pandas
 import yaml
-import func
 
 
 def tagfile_check(tagyaml:pandas.DataFrame):
@@ -111,7 +110,7 @@ def mac_between(target_mac_range:list, mac_addr:str):
         # should input at least 2 mac
         raise BaseException("Tag file error: mac_between() input target mac should a list with 2 mac")
 
-    if func.mac_format_check(mac_addr) is False:
+    if mac_format_check(mac_addr) is False:
         #mac_addr is a bad mac
         return False
 
@@ -121,6 +120,21 @@ def mac_between(target_mac_range:list, mac_addr:str):
             #target_mac_range[0] <= mac addr <= target_mac_range[1]
             return False
     #pass 
+    return True
+
+def mac_format_check(mac:str):
+
+    mac_char = 'abcdefx'
+
+    #check if : is in right place
+    for i in range(2,15,3):
+        if mac[i] != ':':
+            return False
+
+    #check if max is in right format
+    for i in (0,1,3,4,6,7,9,10,12,13,15,16):
+        if not mac[i].isnumeric() and mac[i] not in mac_char:
+            return False
     return True
 
 def has_tag(key_tag:list, device_tags:list):

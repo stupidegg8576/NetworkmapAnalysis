@@ -69,13 +69,14 @@ def get_setting():
     setting['maximum_search'] = 0
     setting['minimum_search_string_len'] = 3
     setting['ratio_count_as_different_tag'] = 0.2
-    setting['input_path_tag_vendor_class'] = 'tag_vendor.yaml'
-    setting['input_path_tag_host_name'] = 'tag_host.yaml'
+    setting['input_path_tag_vendor_class'] = '.\\Data\\tag_vendor.yaml'
+    setting['input_path_tag_host_name'] = '.\\Data\\tag_host.yaml'
     setting['input_path_device_data'] = '.\\Data\\device_list.csv'
+    setting['input_path_keyword_blacklist'] = '.\\Data\\keyword_blacklist.yaml'
     setting['output_path_device_with_tag'] = '.\\Data\\device_device_with_tag.csv'
     setting['output_path_device_without_tag'] = '.\\Data\\device_without_tag.csv'
-    setting['output_path_vendor_class_new_tag'] = '.\\Data\\vendor_class_new_tag.csv'
-    setting['output_path_host_name_new_tag'] = '.\\Data\\host_name_new_tag.csv'
+    setting['output_path_new_keyword_vendor_class'] = '.\\Data\\new_keyword_vendor_class.csv'
+    setting['output_path_new_keyword_host_name'] = '.\\Data\\new_keyword_host_name.csv'
     
     try:
         #read tagfile
@@ -88,14 +89,34 @@ def get_setting():
     print("Read setting file: " + 'setting.yaml')
 
     #update setting
-    setting.update(yaml.load(setting_file, Loader=yaml.CLoader))
+    setting.update(yaml.load(setting_file, Loader=yaml.FullLoader))
+
+    for i in setting:
+        print(i + ": " + str(setting[i]) + str(type(setting[i])))
+
+    if type(setting['maximum_search']) == str:
+        try:
+            setting['maximum_search'] = int(setting['maximum_search'])
+        except:
+            print("Something wrong in setting.yaml")
+    if type(setting['minimum_search_string_len']) == str:
+        try:
+            setting['minimum_search_string_len'] = int(setting['minimum_search_string_len'])
+        except:
+            print("Something wrong in setting.yaml")
+    if type(setting['ratio_count_as_different_tag']) == str:
+        try:
+            setting['ratio_count_as_different_tag'] = float(setting['ratio_count_as_different_tag'])
+        except:
+            print("Something wrong in setting.yaml")
+
 
     return setting   
 
 if __name__ == '__main__':
     #load setting
     setting = get_setting() 
-
+    '''
     try:
         opts, args = getopt.getopt(sys.argv[1:], "i:v:h:o:u:n:", ["input_path_device_data=", "input_path_tag_vendor_class=", "input_path_tag_host_name=" \
                                                 "output_path_device_with_tag=", "output_path_device_without_tag=", "output_path_new_tag"])
@@ -122,7 +143,8 @@ if __name__ == '__main__':
         else:
             print(i)
             raise getopt.GetoptError("Something wrong with opts")
-    
+    '''
+
     #read device data(only with vendor and host name)
     device_DataFrame = read_device_data_file(setting['input_path_device_data'])
 
@@ -149,6 +171,7 @@ if __name__ == '__main__':
     #if there is data in device_with_tag
     if device_with_tag.columns.size:
         for i in range(2,device_with_tag.columns.size):
+            #add column as tag_1, tag_2 ....
             index.append('Tag_' + str(i-1))
         device_with_tag.set_axis(index, axis='columns', inplace=True)
     
@@ -163,7 +186,7 @@ if __name__ == '__main__':
     output_vendor_class_new_keywords = pandas.DataFrame.from_dict(vendor_class_new_keywords, orient='index') 
     output_host_name_new_keywords = pandas.DataFrame.from_dict(host_name_new_keywords, orient='index') 
     
-    output_vendor_class_new_keywords.to_csv(setting['output_path_vendor_class_new_keyword'], sep=';')        
-    output_host_name_new_keywords.to_csv(setting['output_path_host_name_new_keyword'], sep=';')  
+    output_vendor_class_new_keywords.to_csv(setting['output_path_new_keyword_vendor_class'], sep=';')        
+    output_host_name_new_keywords.to_csv(setting['output_path_new_keyword_host_name'], sep=';')  
         
 

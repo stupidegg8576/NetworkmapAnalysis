@@ -228,8 +228,8 @@ def get_tags(tagyaml, device:str):
 
 def apply_tag(device_data:pandas.DataFrame, input_path_tag_vendor_class:str, input_path_tag_host_name:str, max_check:int=0) -> dict:
     
-    tag_vendor_class = read_tag_data_file(input_path_tag_vendor_class)
-    tag_host_name = read_tag_data_file(input_path_tag_host_name)
+    tag_vendor_class = read_tag_data_file(input_path_tag_vendor_class, check=True)
+    tag_host_name = read_tag_data_file(input_path_tag_host_name, check=True)
     
     n = 0
     device_with_tag = {}
@@ -265,7 +265,7 @@ def apply_tag(device_data:pandas.DataFrame, input_path_tag_vendor_class:str, inp
     return device_with_tag, device_without_tag
 
 
-def read_tag_data_file(tag_data_path:str):
+def read_tag_data_file(tag_data_path:str, check=False):
     try:
         #read tagfile
         tag_file = open(tag_data_path,'r')    
@@ -274,8 +274,9 @@ def read_tag_data_file(tag_data_path:str):
 
     print("Read tagfile : " + tag_data_path)
 
-    tagyaml = yaml.load(tag_file, Loader=yaml.CLoader)
+    tagyaml = yaml.load(tag_file, Loader=yaml.FullLoader)
     #check tag data is in right format
-    tagfile_check(tagyaml)
+    if check:
+        tagfile_check(tagyaml)
 
     return tagyaml

@@ -69,14 +69,14 @@ def get_setting():
     setting['maximum_search'] = 0
     setting['minimum_search_string_len'] = 3
     setting['ratio_count_as_different_tag'] = 0.2
-    setting['input_path_tag_vendor_class'] = '.\\Data\\tag_vendor.yaml'
-    setting['input_path_tag_host_name'] = '.\\Data\\tag_host.yaml'
-    setting['input_path_device_data'] = '.\\Data\\device_list.csv'
-    setting['input_path_keyword_blacklist'] = '.\\Data\\keyword_blacklist.yaml'
-    setting['output_path_device_with_tag'] = '.\\Data\\device_device_with_tag.csv'
-    setting['output_path_device_without_tag'] = '.\\Data\\device_without_tag.csv'
-    setting['output_path_new_keyword_vendor_class'] = '.\\Data\\new_keyword_vendor_class.csv'
-    setting['output_path_new_keyword_host_name'] = '.\\Data\\new_keyword_host_name.csv'
+    setting['input_path_tag_vendor_class'] = './Data/tag_vendor.yaml'
+    setting['input_path_tag_host_name'] = './Data/tag_host.yaml'
+    setting['input_path_device_data'] = './Data/device_list.csv'
+    setting['input_path_keyword_blacklist'] = './Data/keyword_blacklist.yaml'
+    setting['output_path_device_with_tag'] = './Data/device_device_with_tag.csv'
+    setting['output_path_device_without_tag'] = './Data/device_without_tag.csv'
+    setting['output_path_new_keyword_vendor_class'] = './Data/new_keyword_vendor_class.csv'
+    setting['output_path_new_keyword_host_name'] = './Data/new_keyword_host_name.csv'
     
     try:
         #read tagfile
@@ -90,9 +90,6 @@ def get_setting():
 
     #update setting
     setting.update(yaml.load(setting_file, Loader=yaml.FullLoader))
-
-    for i in setting:
-        print(i + ": " + str(setting[i]) + str(type(setting[i])))
 
     if type(setting['maximum_search']) == str:
         try:

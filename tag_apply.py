@@ -23,7 +23,7 @@ def tagfile_check(tagyaml:pandas.DataFrame):
                     #convert tags to lower case
                     tagyaml[tag][conditions][subconditions] = [keyword.replace(keyword, keyword.lower()) for keyword in tagyaml[tag][conditions][subconditions]]
                     
-    print("Tagfile Check Pass")
+    print("Tagfile Check Pass.")
 
 def with_check(keyword:list, device:str):
     #check if vendor calss or host name contain any target strings 
@@ -234,7 +234,7 @@ def apply_tag(device_data:pandas.DataFrame, input_path_tag_vendor_class:str, inp
     n = 0
     device_with_tag = {}
     device_without_tag = {}
-    print("Apply tags..")
+    
     l = ' / ' + str(len(device_data))
 
     for device in device_data.iloc():
@@ -243,7 +243,7 @@ def apply_tag(device_data:pandas.DataFrame, input_path_tag_vendor_class:str, inp
             break 
         
         if not n % 100:
-            print(str(n) + l,end='\r')
+            print("Applying tag to devices: " + str(n) + l,end='\r')
         n = n + 1
         #for each device in data, send MAC, Vendor Class, Host Name, tags[] to get_tags()
         #get_tags() return a list of string of tags
@@ -261,7 +261,7 @@ def apply_tag(device_data:pandas.DataFrame, input_path_tag_vendor_class:str, inp
         else:
             device_without_tag[n] = [device['Vendor_Class'], device['Host_Name']]
     
-    print("")
+    print("Applying tag to devices: " + str(n) + l)
     return device_with_tag, device_without_tag
 
 

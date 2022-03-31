@@ -56,7 +56,7 @@ def keyword_filter(keywords_data:dict, device_list:list, setting:dict) -> dict:
             break
     keywords_data = temp
 
-    print("Tag filtering")
+   
     n = 0
     l = ' / ' + str(len(keywords_data))
     ratio_count_as_different_tag = setting['ratio_count_as_different_tag']
@@ -72,8 +72,8 @@ def keyword_filter(keywords_data:dict, device_list:list, setting:dict) -> dict:
         #tag = tag name
         #tag_data[tag] = the number of device has this tag
         
-        if not n % 1000:
-            print(str(n) + l, end= '\r')
+        if not n % 100:
+            print("Filtering out tags from datebase and blacklist: " + str(n) + l, end= '\r')            
         if maximum_search != 0 and n >= maximum_search:
             break
         n = n + 1
@@ -110,7 +110,8 @@ def keyword_filter(keywords_data:dict, device_list:list, setting:dict) -> dict:
         #if all other tag are not similar, add it to good keywords
         if is_a_new_keyword:
             good_keywords[keyword] = keywords_data[keyword]
-
+            
+    print("Filtering out tags from datebase and blacklist: " + str(n) + l, end= '\r') 
     print("\nKeywords filtering Done!")
     return good_keywords
 
@@ -122,6 +123,7 @@ def keyword_search(device_without_tag:list, device_list:list, setting:dict) -> d
     l = '/' + str(len(device_without_tag))
     maximum_search = setting['maximum_search']
     minimum_search_string_len = setting['minimum_search_string_len']
+    print(str(len(device_without_tag)) + " device can't be classified.")    
 
     for device_name in device_without_tag:        
         #max loop times
@@ -129,7 +131,7 @@ def keyword_search(device_without_tag:list, device_list:list, setting:dict) -> d
         if maximum_search != 0 and n >= maximum_search:
             break
         if not n % 10:
-            print("tag_search: " + str(n) + l ,end='\r')
+            print("New key word searching: " + str(n) + l ,end='\r')
         
         #from each device_without_tag_name
         #get all sub string longer than minimum string long
@@ -148,6 +150,7 @@ def keyword_search(device_without_tag:list, device_list:list, setting:dict) -> d
     
     
     #sort tag by device number
+    print("New key word searching: " + str(n) + l ,end='\r')
     keywords = dict(sorted(keywords.items(),key= lambda item: item[1], reverse=True))
     print("\nTag search done!")      
 

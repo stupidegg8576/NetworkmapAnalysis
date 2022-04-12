@@ -248,7 +248,8 @@ def apply_tag(device_data: pandas.DataFrame, input_path_tag_vendor_class: str, i
 
     tag_vendor_class = read_tag_data_file(
         input_path_tag_vendor_class, check=True)
-    tag_host_name = read_tag_data_file(input_path_tag_host_name, check=True)
+    tag_host_name = read_tag_data_file(
+        input_path_tag_host_name, check=True)
 
     n = 0
     device_with_tag = {}

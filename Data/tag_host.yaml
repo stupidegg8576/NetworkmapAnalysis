@@ -1,23 +1,192 @@
 iot:
   con1:
-    with: [ cam, light, -fan-, home, chromecast, yeelink, esp_, amazon-, _mibt, lgwebostv, plug, _miap, chuangmi]
+    with:
+      - 'cam'
+      - 'light'
+      - '-fan-'
+      - 'home'
+      - 'Sonos'
+      - 'chromecast'
+      - 'yeelink'
+      - 'esp_'
+      - 'esp-'
+      - 'amazon-'
+      - '_mibt'
+      - 'lgwebostv'
+      - 'plug'
+      - '_miap'
+      - 'chuangmi'
+      - 'chunmi'
+      - 'mitv'
+      - 'dlink'
+      - 'google-nest'
+      - 'roku'
+      - 'bedroom'
+      - 'bed-room'
+      - 'living-room'
+      - 'livingroom'
+      - 'roomba'
+      - 'robo'
+      - 'mysimplelink'
+      - 'purifier'
+      - 'smart'
+      - 'switch'
+      - 'familyroom'
+      - 'family-room'
+      - 'gateway'
+      - 'shellydimmer'
+      - 'shellymotionsensor'
+      - 'shellyplus'
+      - 'shelly1'
+      - 'lumi-acpartner'
+      - 'Electrolux'
+      - 'tinymu-toiletlid'
+      - 'yeelink'
+      - 'mrbond-airer'
+      - 'hyd-airer'
+      - 'PETKIT_DFOOD'
+      - 'levoit-humidifier'
+      - 'rt-'
+      - 'dsl-'
+      - 'pl-'
+      - 'play station'
+      - 'playstation'
+      - 'PS5'
+      - 'rp-'
+      - 'ea-'
+      - 'wmp-'
+      - 'RingPro'
+      - '_miio'
+      - 'audio'
+      - 'miaisoundbox'
+      - 'xbox'
+      - 'streamingstick'
+      - 'dormitorio' # bedroom in spanish
+      - 'kitchen'
+      - 'room'
+      - 'playfi'
+      - 'leviton'
+      - 'doorbell'
+      - 'tivo'
+      - 'wlan0'
+      - 'nest-hello' #google
+      - 'nest-thermostat'
+      - 'lifx'
+      - 'harmonyhub'
+      - 'linksys'
+      - 'wiz_'
+      - 'wiz-'
+      - 'ring-'
+      - 'myq-'
+      - 'tizen'
+      - 'espressif'
+      - 'philips'
+      - 'ecobee'
+      - 'blink-sync'
+      - 'wifi'
 
 windows:
   con1:
-    with: [desktop, pc, win, laptop]
-    notag: [iot]
-
+    with:
+      - 'desktop'
+      - 'pc'
+      - 'win'
+      - 'laptop'
+      - 'nb'
+      - 'thinkpad'
+      - 'elitebook'
+      - 'notebook'
 apple:
   con1:
-    with: [iphone, iwatch, ipad, macbook, apple, mbp, imac]
-    notag: [iot]
-
+    with:
+      - 'iphone'
+      - 'iwatch'
+      - 'ipad'
+      - 'macbook'
+      - 'mac-mini'
+      - 'macmini'
+      - 'apple'
+      - 'mbp'
+      - 'mba'
+      - 'imac'
+      - 'ipod'
+      - 'plewatch' # apple watch?
+      - 's-air' # some one's air ?
 android:
   con1:
-    with: [android, galaxy, huawei, redmi, samsung, pixel-]     
-    without: [apple]
-    notag: [iot]
-
+    with:
+      - 'android'
+      - 'galaxy'
+      - 'huawei'
+      - 'redmi'
+      - 'samsung'
+      - 'pixel'
+      - 'oppo'
+      - 'vivo'
+      - '-s-s'
+      - 's-Note'
+      - 'phone'
+      - 'ROG'
+      - 'htc'
+      - 'MiPhone'
+      - 'iqoo-'
+      - '-ultra'
+      - 'honor_v30'
+      - 'note1'
+      - 'note2'
+      - 'oneplus'
+    without:
+      - 'iphone'
 linux:
   con1:
-    with: [raspberrypi, linux]
+    with:
+      - 'raspberrypi'
+      - 'linux'
+router:
+  con1:
+    with:
+      - 'rt-'
+      - 'dsl-'
+      - 'pl-'
+NAS:
+  con1:
+    with:
+      - 'storage'
+      - 'nas'
+      - 'synology'
+IP Camera:
+  con1:
+    with:
+      - 'cam'
+      - 'AiCam'
+      - 'blink-mini'
+      - 'ASUS'
+Game Console:
+  con1:
+    with:
+      - 'play station'
+      - 'playstation'
+      - 'PS5'
+      - 'PS4'
+      - 'xbox'
+ROG Device:
+  con1:
+    with:
+      - 'rog'
+Printer:
+  con1:
+    with:
+      - 'epson'
+      - 'fuji xerox'
+      - 'canon'
+      - 'brother'
+Maybeiot:
+  con1:
+    with:
+      - 'aa01a'
+      - 'honor_'
+
+tesla:
+  con1:
+    with:
+      - 'tesla'

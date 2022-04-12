@@ -1,8 +1,3 @@
 __pycache__/
-Data/device_without_tag.csv
-Data/device_device_with_tag.csv
-Data/new_keyword_host_name.csv
-Data/new_keyword_vendor_class.csv
-Data/new_tag_host_name.csv
-Data/new_tag_vendor_class.csv
+Data/*.csv
 test*

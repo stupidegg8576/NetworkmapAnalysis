@@ -1,33 +1,82 @@
 iot:
   con1:
-    with: [ cam, light, -fan-, home]
-
+    with:
+      - 'cam'
+      - 'light'
+      - '-fan-'
+      - 'home'
+      - 'ADOBE'
+      - 'Amazon'
+      - 'Apple'
+      - 'BELKIN'
+      - 'Belkin'
+      - 'BizLink'
+      - 'BUFFALO'
+      - 'Dell'
+      - 'DellKing'
+      - 'D-Link'
+      - 'FUJITSU'
+      - 'Fujitsu'
+      - 'Google'
+      - 'HON HAI'
+      - 'Hon Hai'
+      - 'HTC'
+      - 'HUAWEI'
+      - 'Huawei'
+      - 'IBM'
+      - 'Lenovo'
+      - 'NEC'
+      - 'MICROSOFT'
+      - 'Microsoft'
+      - 'Panasonic'
+      - 'PANASONIC'
+      - 'PIONEER'
+      - 'Pioneer'
+      - 'Ralink'
+      - 'Samsung'
+      - 'SAMSUNG'
+      - 'Sony'
+      - 'Synology'
+      - 'TOSHIBA'
+      - 'Toshiba'
+      - 'TP-LINK'
+      - 'VMware'
+      - 'udhcp 1.'
+      - 'emlab'
 windows:
   con1:
-    with: [msft, microsoft]
-    notag: [iot]
-
+    with:
+      - 'msft'
+      - 'microsoft'
 apple:
   con1:
-    with: [iphone, iwatch, ipad, macbook, apple, mbp, imac]
-    without: [android]
-    notag: [iot]
-
+    with:
+      - 'iphone'
+      - 'iwatch'
+      - 'ipad'
+      - 'macbook'
+      - 'apple'
+      - 'mbp'
+      - 'imac'
 android:
   con1:
-    with: [android, galaxy, huawei, android-dhcp, Google] 
-    without: [apple]
-    notag: [iot]
-
+    with:
+      - 'android'
+      - 'galaxy'
+      - 'huawei'
+      - 'android-dhcp'
+      - 'Google'
+      - 'ZenFone'
+      - 'ASUS_Phone'
+    without:
+      - 'apple'
 linux:
   con1:
-    with: [linux]
-
-
-
-
-
-
-
-
-
+    with:
+      - 'linux'
+      - 'dhcpcd'
+asus:
+  con1:
+    with:
+      - 'ZenFone'
+      - 'ASUS_Phone'

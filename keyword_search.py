@@ -1,4 +1,7 @@
+from itertools import repeat
 import tag_apply
+import multiprocessing
+import time
 
 
 def count_as_diff_keyword(a: int, b: int, ratio_count_as_different_tag: float):
@@ -108,7 +111,7 @@ def keyword_filter(keywords_data: dict, device_list: list, setting: dict) -> dic
                 # -1 means keyword hasn't been searched before
                 if keywords_in_tagfile[k_in_tagfile] == -1:
                     keywords_in_tagfile[k_in_tagfile] = search_device_data(
-                        device_list, k_in_tagfile)
+                        k_in_tagfile, device_list)[1]
                 # if these two keyword are same and the difference of their device count is not big
                 # there is already a similar keyword in tag databade
                 if not count_as_diff_keyword(keywords_data[keyword], keywords_in_tagfile[k_in_tagfile], ratio_count_as_different_tag):
@@ -124,52 +127,80 @@ def keyword_filter(keywords_data: dict, device_list: list, setting: dict) -> dic
     return good_keywords
 
 
+class multi_data():
+    pass
+
+
+def search_a_keyword(device_name, m):
+
+    keyword_this_process = set()
+    # from each device_without_tag_name
+    # get all sub string longer than minimum string long
+    # and search how many times it apears in device_list
+
+    for start in range(0, len(device_name) - m.minimum_search_string_len):
+        if device_name[start:] in keyword_this_process:
+            # if already in dictionary, break
+            # next string is substring of [start:],so if tags cotain [start:], tag will contain all  later strings
+            break
+        for end in range(len(device_name), start + m.minimum_search_string_len, -1):
+            if device_name[start:end] in keyword_this_process:
+                # if already in dictionary, pass
+                break
+            # store the number of device has tag in tags{}
+            keyword_this_process.add(device_name[start:end])
+
+    return keyword_this_process
+
+
 def keyword_search(device_without_tag: list, device_list: list, setting: dict) -> dict:
     # for all device_without_tag, search all other device in device list
     # try to find keywords for generating new tag
-    keywords = {}
-    n = 0
+
     l = '/' + str(len(device_without_tag))
-    maximum_search = setting['maximum_search']
+
     minimum_search_string_len = setting['minimum_search_string_len']
     print(str(len(device_without_tag)) + " device can't be classified.")
 
-    for device_name in device_without_tag:
-        # max loop times
-        n = n + 1
-        if maximum_search != 0 and n >= maximum_search:
-            break
-        if not n % 10:
-            print("New key word searching: " + str(n) + l, end='\r')
+    pool = multiprocessing.Pool(multiprocessing.cpu_count())
 
-        # from each device_without_tag_name
-        # get all sub string longer than minimum string long
-        # and search how many times it apears in device_list
-        for start in range(0, len(device_name) - minimum_search_string_len):
-            if device_name[start:] in keywords:
-                # if already in dictionary, break
-                # next string is substring of [start:],so if tags cotain [start:], tag will contain all  later strings
-                break
-            for end in range(len(device_name), start + minimum_search_string_len, -1):
-                if device_name[start:end] in keywords:
-                    # if already in dictionary, pass
-                    break
-                # store the number of device has tag in tags{}
-                keywords[device_name[start:end]] = search_device_data(
-                    device_list, device_name[start:end])
+    m = multi_data()
+    m.device_list = device_without_tag
+    m.minimum_search_string_len = minimum_search_string_len
+    print("Searching new key word...")
+    words = pool.starmap(search_a_keyword, zip(device_without_tag, repeat(m)))
+
+    pool.close()
+    pool.join()
+    keywords = set()
+    for w in words:
+        keywords.update(w)
+
+    print("Count the number of device with tags...")
+
+    pool = multiprocessing.Pool(int(multiprocessing.cpu_count()/2))
+
+    temp = pool.starmap(search_device_data, zip(
+        list(keywords), repeat(device_without_tag)))
+
+    pool.close()
+    pool.join()
+
+    keywords = {}
+    for t in temp:
+        keywords[t[0]] = t[1]
 
     # sort tag by device number
-    print("New key word searching: " + str(n) + l, end='\r')
     keywords = dict(
         sorted(keywords.items(), key=lambda item: item[1], reverse=True))
     print("\nTag search done!")
 
-    return keyword_filter(keywords, device_list, setting)
+    return keyword_filter(keywords, device_without_tag, setting)
 
 
-def search_device_data(device_list: list, target_device_name: str) -> int:
+def search_device_data(target_substring, device_list):
     count = 0
     for device_name in device_list:
-        if target_device_name in device_name:
+        if target_substring in device_name:
             count = count + 1
-    return count
+    return (target_substring, count)

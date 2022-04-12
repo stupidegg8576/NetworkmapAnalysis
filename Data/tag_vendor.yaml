@@ -43,6 +43,7 @@ iot:
       - 'VMware'
       - 'udhcp 1.'
       - 'emlab'
+      - 'kindle'
 windows:
   con1:
     with:

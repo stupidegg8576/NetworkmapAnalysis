@@ -3,6 +3,7 @@ import tag_apply
 import keyword_search
 import sys
 import yaml
+import getopt
 
 # Read Device list file
 
@@ -126,18 +127,44 @@ if __name__ == '__main__':
     setting = get_setting()
     opts = sys.argv
 
-    mode = 0
+    searching_new_keyword = False
 
     # update setting if using args
-    if len(opts) > 1:
-        if opts[1][0] == 'a' or opts[1][0] == 'A':
-            mode = 0
-        elif opts[1][0] == 'k' or opts[1][0] == 'K':
-            mode = 1
-        else:
-            print('A for applying tag to device list, K for searching new keyword')
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "i:t:o:u:n:k", ["input_file=", "input_tag_data=",
+                                                                 "output_with_tag=", "output_without_tag=", "output_new_tag", "searching new keyword"])
+    except getopt.GetoptError:
+        print("Something wrong with opts")
+        raise getopt.GetoptError("Something wrong with opts")
 
-    if mode == 0 or mode == 1:
+    maximum_search = 0
+    print(opts)
+
+    # update setting if using args
+    for i in opts:
+        if len(i) < 2:
+            raise getopt.GetoptError("Something wrong with opts")
+        if i[0] == '-i':
+            input_device_data_path = i[1]
+        elif i[0] == '-t':
+            input_tag_data_path = i[1]
+            setting['input_path_device_data'] = i[1]
+        elif i[0] == '-v':
+            setting['input_path_tag_vendor_class'] = i[1]
+        elif i[0] == '-h':
+            setting['input_path_tag_host_name'] = i[1]
+        elif i[0] == '-o':
+            output_path_device_with_tag = i[1]
+            setting['output_path_device_with_tag'] = i[1]
+        elif i[0] == '-u':
+            output_path_device_without_tag = i[1]
+            setting['output_path_device_without_tag'] = i[1]
+        elif i[0] == '-n':
+            output_path_new_tag = i[1]
+        elif i[0] == '-k':
+            searching_new_keyword = True
+
+    if True:
         # read device data(only with vendor and host name)
         device_DataFrame = read_device_data_file(
             setting['input_path_device_data'])
@@ -178,7 +205,7 @@ if __name__ == '__main__':
         device_without_tag.to_csv(
             setting['output_path_device_without_tag'], sep=';', index=False)
 
-    if mode == 1:
+    if searching_new_keyword:
         # searching new tag in device_without_tag
         vendor_class_new_keywords, host_name_new_keywords = search_new_keyword(
             device_without_tag, device_DataFrame, setting)

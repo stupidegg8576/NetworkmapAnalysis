@@ -1,4 +1,3 @@
-from tkinter.messagebox import NO
 import yaml
 import json
 import sys

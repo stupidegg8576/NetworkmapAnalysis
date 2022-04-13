@@ -11,7 +11,7 @@ import getopt
 def read_device_data_file(data_path: str):
     try:
         device_data = pandas.read_csv(
-            data_path, on_bad_lines='skip', delimiter=';')
+            data_path,  delimiter=';')
     except Exception:
         raise FileExistsError("Device list read failed : " + data_path)
     print("Read Device list : " + data_path)

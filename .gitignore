@@ -1,3 +1,4 @@
 __pycache__/
-Data/*.csv
+Data
 test*
+Data/device_list.dat

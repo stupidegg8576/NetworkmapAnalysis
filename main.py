@@ -11,16 +11,19 @@ import getopt
 def read_device_data_file(data_path: str):
     try:
         device_data = pandas.read_csv(
-            data_path,  delimiter=';')
+            data_path,  delimiter=';', encoding='utf-8', keep_default_na=False)
     except Exception:
         raise FileExistsError("Device list read failed : " + data_path)
     print("Read Device list : " + data_path)
+    print(device_data)
+
     return device_data
 
 
 def write_result_file(data_path: str, data):
     try:
-        pandas.read_csv(data_path, on_bad_lines='skip', delimiter=';')
+        pandas.read_csv(data_path, on_bad_lines='skip',
+                        delimiter=';', encoding='utf-8')
     except Exception:
         raise FileExistsError("write result file failed : " + data_path)
 
@@ -81,7 +84,7 @@ def get_setting():
     setting['ratio_count_as_different_tag'] = 0.2
     setting['input_path_tag_vendor_class'] = './Data/tag_vendor.yaml'
     setting['input_path_tag_host_name'] = './Data/tag_host.yaml'
-    setting['input_path_device_data'] = './Data/device_list.csv'
+    setting['input_path_device_data'] = './Data/device_list.txt'
     setting['input_path_keyword_blacklist'] = './Data/keyword_blacklist.yaml'
     setting['output_path_device_with_tag'] = './Data/device_device_with_tag.csv'
     setting['output_path_device_without_tag'] = './Data/device_without_tag.csv'
